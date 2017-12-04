@@ -3,7 +3,8 @@
 #include "systemInit.h"
 #include "LCDRoutines.h"
 
-#define LCD_DSIPLAy_LEN 16
+#define LCD_DSIPLAY_LEN 16
+
 #define SBIT_WordLenght    0x00u
 #define SBIT_DLAB          0x07u
 #define SBIT_FIFO          0x00u
@@ -18,11 +19,11 @@
 
 void lcd_init(void);					
 void lcd_write_control(unsigned char);
-void lcd_write_ascii(unsigned char); 	// Write LCD Display(ASCII)
-void goto_cursor(unsigned char);		// Set Position Cursor LCD
-void lcd_print(unsigned char*);			// Print Display to LCD
-void enable_lcd(void);	 				// Enable Pulse
-void delay(unsigned long int);			// Delay Function
+void lcd_write_ascii(unsigned char); 	
+void goto_cursor(unsigned char);		
+void lcd_print(unsigned char*);			
+void enable_lcd(void);	 				
+void delay(unsigned long int);			
 
 
 /* Function to initialize the UART0 at specifief baud rate */
@@ -94,7 +95,7 @@ int main()
     {
          ch[i] = uart_RxChar();
 		 send_line_lcd(ch); 
-		 if(i == (LCD_DSIPLAy_LEN-1))
+		 if(i == (LCD_DSIPLAY_LEN-1))
 		 	i = 0;
 		 i++; 
     }       
