@@ -1,19 +1,9 @@
-/****************************************************
-*
-*  Code for a duplex link over UART to PC.
-*  UART configured at 9600 baud rate. When LPC 2148 
-*  board boots up ist sends a "Test Link Established"
-*  to Hyperterm. 
-*  User can then send any charater from keyboard to 
-*  LCD display on LPC2148 Board.
-*
-*****************************************************/   
-
 #include <lpc214x.h>
 #include "stdutils.h"	
 #include "systemInit.h"
 #include "LCDRoutines.h"
-#define LCD_DISPAY_LEN	   16 	
+
+#define LCD_DSIPLAy_LEN 16
 #define SBIT_WordLenght    0x00u
 #define SBIT_DLAB          0x07u
 #define SBIT_FIFO          0x00u
@@ -26,7 +16,14 @@
 #define TX0_PINSEL            0
 #define RX0_PINSEL            2
 
-extern void SystemInit(void);
+void lcd_init(void);					
+void lcd_write_control(unsigned char);
+void lcd_write_ascii(unsigned char); 	// Write LCD Display(ASCII)
+void goto_cursor(unsigned char);		// Set Position Cursor LCD
+void lcd_print(unsigned char*);			// Print Display to LCD
+void enable_lcd(void);	 				// Enable Pulse
+void delay(unsigned long int);			// Delay Function
+
 
 /* Function to initialize the UART0 at specifief baud rate */
 void uart_init(uint32_t baudrate)
@@ -42,7 +39,7 @@ void uart_init(uint32_t baudrate)
     U0DLL =  var_RegValue_u32 & 0xFF;
     U0DLM = (var_RegValue_u32 >> 0x08) & 0xFF;
 
-    util_BitClear(U0LCR,(SBIT_DLAB));  			// Clear DLAB after setting DLL,DLM
+    util_BitClear(U0LCR,(SBIT_DLAB));  // Clear DLAB after setting DLL,DLM
 }
 
 
@@ -63,41 +60,42 @@ char uart_RxChar()
   return ch;
 }
 
-void send_line_lcd(char* buf)
+void send_line_lcd(unsigned char* buf)
 {
-    lcd_write_control(0x01);            // Clear Display  (Clear Display,Set DD RAM Address=0) 
+    lcd_write_control(0x01);                   // Clear Display  (Clear Display,Set DD RAM Address=0) 
     goto_cursor(0x00);		 
 	lcd_print(buf); 
 }
 
 int main()
 {
-  	
-    char ch[16],a[]="\n\rTest Link Established";
-    int i = 0;
+  	unsigned char ch[16],a[]="\n\rTest Link Established";
+    int i;
 
 	lcd_init();	
-	lcd_write_control(0x01);  	        // Clear Display  (Clear Display,Set DD RAM Address=0) 
-    goto_cursor(0x00);					// Set Cursor Line-1
-    lcd_print(" INITIALIZING LCD");		// Display LCD Line-1 
-	delay(100000);						// Display Delay 
-	lcd_write_control(0x01);  			// Clear Display  (Clear Display,Set DD RAM Address=0
+	lcd_write_control(0x01);  							// Clear Display  (Clear Display,Set DD RAM Address=0) 
+    goto_cursor(0x00);									// Set Cursor Line-1
+    lcd_print("INITIALIZING LCD");						// Display LCD Line-1 
+	delay(100000);									    // Display Delay 
+	lcd_write_control(0x01);  							// Clear Display  (Clear Display,Set DD RAM Address=0
 
 
     SystemInit();
-    uart_init(9600);  					// Initialize the UART0 for 9600 baud rate
+    uart_init(9600);  // Initialize the UART0 for 9600 baud rate
 
-    for(i=0;a[i];i++)  					//Transmit a predefined string
+   
+
+    for(i=0;a[i];i++)  //transmit a predefined string
         uart_TxChar(a[i]);
+	
 
-	 while(1)
+	i = 0;
+    while(1)
     {
-         // Receive a char and display it on LCD 
-		 // Display will wrap around after 16 characters
-		 ch[i] = uart_RxChar();
+         ch[i] = uart_RxChar();
 		 send_line_lcd(ch); 
-		 if(i == (LCD_DISPAY_LEN-1))
+		 if(i == (LCD_DSIPLAy_LEN-1))
 		 	i = 0;
 		 i++; 
-     }       
+    }       
 }
