@@ -151,7 +151,7 @@ void enable_lcd(void)	 								// Enable Pulse
 
   
   lcd_en_set();  										// Enable ON
-  for (i=0;i<400000;i++);
+  for (i=0;i<4000;i++);
   lcd_en_clr();  										// Enable OFF 
 }
 
