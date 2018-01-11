@@ -18,6 +18,7 @@
  *		- Enable UART0 IRQ slot 
  *		- Enable RBR interrupt
  *
+ * For comments	write to me : mathew.p.joseph@gmail.com
 */
 
 #include <lpc214x.h>
