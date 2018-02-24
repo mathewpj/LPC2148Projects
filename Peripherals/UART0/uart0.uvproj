@@ -44,7 +44,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\</OutputDirectory>
-          <OutputName>uart1</OutputName>
+          <OutputName>uart0</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>
@@ -402,24 +402,14 @@
               <FilePath>.\main.c</FilePath>
             </File>
             <File>
-              <FileName>LCDRoutines.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\LCDRoutines.h</FilePath>
-            </File>
-            <File>
-              <FileName>stdutils.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\stdutils.h</FilePath>
-            </File>
-            <File>
               <FileName>systemInit.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\systemInit.c</FilePath>
             </File>
             <File>
-              <FileName>systemInit.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\systemInit.h</FilePath>
+              <FileName>uart0.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\uart0.c</FilePath>
             </File>
           </Files>
         </Group>

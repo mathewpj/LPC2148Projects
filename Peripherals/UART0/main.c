@@ -1,21 +1,33 @@
+/*********************************************************
+*
+* Program to establish serial communication via UART 0.
+*  
+* Setup : Connect a serial cable (or via serial to USB 
+* coverter) to the computer's serial (or USB Port). Open
+* a Tera term( or Hyperterm) configured for 9600 Baud. 
+* 
+* On sucessfull link inilialization, the program sends
+* a string "Test Link Established" to the Terminal.
+* Now the system is ready to receive any keyboard presses
+* via UART0 and display it on the LCD display.
+*
+* Author : Mathew Joseph
+* e-mail : mathew.p.joseph@gmail.com
+*
+*********************************************************/   
+
 #include <lpc214x.h>
 #include "stdutils.h"	
 #include "systemInit.h"
 #include "LCDRoutines.h"
+#include "uart0.h"
 
 #define LCD_DSIPLAY_LEN 16
 
-#define SBIT_WordLenght    0x00u
-#define SBIT_DLAB          0x07u
-#define SBIT_FIFO          0x00u
-#define SBIT_RxFIFO        0x01u
-#define SBIT_TxFIFO        0x02u
 
-#define SBIT_RDR           0x00u
-#define SBIT_THRE          0x05u
 
-#define TX0_PINSEL            0
-#define RX0_PINSEL            2
+
+
 
 void lcd_init(void);					
 void lcd_write_control(unsigned char);
@@ -24,7 +36,7 @@ void goto_cursor(unsigned char);
 void lcd_print(unsigned char*);			
 void enable_lcd(void);	 				
 void delay(unsigned long int);			
-
+#if 0
 
 /* Function to initialize the UART0 at specifief baud rate */
 void uart_init(uint32_t baudrate)
@@ -60,6 +72,8 @@ char uart_RxChar()
     ch = U0RBR;                                // Read received data  
   return ch;
 }
+
+#endif
 
 void send_line_lcd(unsigned char* buf)
 {
