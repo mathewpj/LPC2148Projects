@@ -6,7 +6,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-//#include "debug.h"
 #include "LPC214x.H"	// LPC2148 MPU Register
 #include "type.h"
 #include "uart0.h"
@@ -33,29 +32,6 @@ void delay(unsigned long int count1)
 /*-----------------------------------------------------------------------*/
 /* Initialize Disk Drive                                                 */
 /*-----------------------------------------------------------------------*/
-
-#if 0
-void disk_initialize (void)
-{
-		int i;
-		unsigned char tp1[]="\n\r After call SD_Init()";		
-		unsigned char tp2[]="\n\r After call SD_ReadConfiguration()";
-
-		SystemInit();
-    	uart_init(9600);  // Initialize the UART0 for 9600 baud rate
-
-		SD_Init(); 				
-		for(i=0;tp1[i];i++)  //transmit a predefined string
-        	uart_TxChar(tp1[i]);
-
-		SD_ReadConfiguration();
-		for(i=0;tp2[i];i++)  //transmit a predefined string
-        	uart_TxChar(tp2[i]);
-        return;
-}
-#endif
-
-
 
 main()
 {
@@ -179,5 +155,5 @@ main()
 		uart_TxChar(send[1]); 
 		#endif 
 	}
+ }
 
-}
