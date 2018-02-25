@@ -1,22 +1,19 @@
 
 #include <stdint.h>
+#include "debug.h"
 #include "type.h"
 #include "sd.h"
 #include "spi.h"
 #include "uart0.h"
+#include "diskio.h"
 
-/* Initilize an array with ASCII values of 0 to F */
-// 0 = 48
-// ...
-// 9 = 57
-// A = 65
-// ...
-// 70 = F  
-char ascii_string[16] ={48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 65, 66, 67, 68, 69, 70};
-unsigned char hn, ln, temp;
+
+
 
 CARDCONFIG CardConfig;
 
+/* Local variables */
+static volatile DSTATUS Stat = STA_NOINIT;	/* Disk status */
 
 /**
   * @brief  Initializes the memory card.
@@ -280,7 +277,7 @@ init_end:
         	return (SD_FALSE);
     	}
     	else{     /* Init OK. use high speed during data transaction stage. */
-        	SPI_ConfigClockRate (SPI_CLOCKRATE_HIGH);
+        	//SPI_ConfigClockRate (SPI_CLOCKRATE_HIGH);
         	return (SD_TRUE);
     	}
 }
@@ -320,8 +317,8 @@ uint8_t SD_SendCommand (uint8_t cmd, uint32_t arg, uint8_t *buf, uint32_t len)
     else if (cmd == SEND_IF_COND)   crc_stop = 0x87; /* valid CRC7 + stop bit */
     else                            crc_stop = 0x01; /* dummy CRC7 + Stop bit */
 
-   	for(j=0;tp4[j];j++)  //transmit a predefined string
-        	uart_TxChar(tp4[j]);
+   	//for(j=0;tp4[j];j++)  //transmit a predefined string
+    //    	uart_TxChar(tp4[j]);
     /* Send 6-byte command with CRC. */
     SPI_SendByte (cmd | 0x40);
     SPI_SendByte (arg >> 24);
@@ -386,19 +383,282 @@ uint8_t SD_SendACommand (uint8_t cmd, uint32_t arg, uint8_t *buf, uint32_t len)
   */
 SD_BOOL SD_ReadConfiguration ()
 {
-    uint8_t buf[16];
-    uint32_t i, c_size, c_size_mult, read_bl_len;
+    uint8_t buf[16], byte0, byte1, byte2, byte3, cid[10], r1, byte;
+    uint32_t i,j, c_size, c_size_mult, read_bl_len;
     SD_BOOL retv;
-  
+
+	unsigned char tp20[]="\n\rInside SD_ReadConfiguration: ";
+	unsigned char tp21[]="\n\rResponse to SD_SendCommand(READ_OCR): ";
+	unsigned char tp22[]="\n\rResponse to READ_OCR: ";
+	unsigned char tp23[]="\n\rSending READ_CID: ";
+   	unsigned char tp24[]="\n\rCard Type CARDTYPE_SDV2_HC ";
+
+	for(j=0;tp20[j];j++)  	//transmit a predefined string
+    	uart_TxChar(tp20[j]);
+
     retv = SD_FALSE;
 
     /* Read OCR */
-    if (SD_SendCommand(READ_OCR, 0, CardConfig.ocr, 4) != R1_NO_ERROR) goto end;
+    //if (SD_SendCommand(READ_OCR, 0, CardConfig.ocr, 4) != R1_NO_ERROR) goto end;
+	r1 = SD_SendCommand(READ_OCR, 0, CardConfig.ocr, 4);
+	for(j=0;tp21[j];j++)  	//transmit a predefined string
+    	uart_TxChar(tp21[j]);
+	{
+			hn = r1 >> 4;
+  			r1 = r1 << 4;
+  			r1 = r1 >> 4;
+  			ln = r1;
+			send[0]	= ascii_string[hn]; 
+			send[1]	= ascii_string[ln]; 
+		   	
+			uart_TxChar(send[0]);
+			uart_TxChar(send[1]);
 
+	}
+	if( r1 != R1_NO_ERROR)
+	 goto end;	
+
+/****************Mathew *********************/
+	for(j=0;tp22[j];j++)  	//transmit a predefined string
+    	uart_TxChar(tp22[j]);
+#if 1
+		{
+			byte0 = CardConfig.ocr[0];
+			hn = byte0 >> 4;
+  			byte0 = byte0 << 4;
+  			byte0 = byte0 >> 4;
+  			ln = byte0;
+			send[0]	= ascii_string[hn]; 
+			send[1]	= ascii_string[ln]; 
+		   	
+			uart_TxChar(send[0]);
+			uart_TxChar(send[1]);
+		}
+		{
+			byte1 = CardConfig.ocr[1];
+			hn = byte1 >> 4;
+  			byte1 = byte1 << 4;
+  			byte1 = byte1 >> 4;
+  			ln = byte1;
+			send[0]	= ascii_string[hn]; 
+			send[1]	= ascii_string[ln]; 
+		   	
+			uart_TxChar(send[0]);
+			uart_TxChar(send[1]);
+		}
+		{
+			byte2 = CardConfig.ocr[2];
+			hn = byte2 >> 4;
+  			byte2 = byte2 << 4;
+  			byte2 = byte2 >> 4;
+  			ln = byte2;
+			send[0]	= ascii_string[hn]; 
+			send[1]	= ascii_string[ln]; 
+		   	
+			uart_TxChar(send[0]);
+			uart_TxChar(send[1]);
+		}
+		{
+			byte3 = CardConfig.ocr[3];
+			hn = byte3 >> 4;
+  			byte3 = byte3 << 4;
+  			byte3 = byte3 >> 4;
+  			ln = byte3;
+			send[0]	= ascii_string[hn]; 
+			send[1]	= ascii_string[ln]; 
+		   	
+			uart_TxChar(send[0]);
+			uart_TxChar(send[1]);
+		}
+
+
+#endif
+/*******************************************/
+
+
+	for(j=0;tp23[j];j++)  	//transmit a predefined string
+    uart_TxChar(tp23[j]);
     /* Read CID */
     if ((SD_SendCommand(SEND_CID, 0, NULL, 0) != R1_NO_ERROR) ||
         SD_RecvDataBlock (CardConfig.cid, 16)==SD_FALSE) goto end;
+/*********************************************/
+#if 0
+	  for(j=0;j<16;j++)
+	   cid[j] = CardConfig.cid[j];
 
+	   	{
+			byte0 = cid[0];
+			hn = byte0 >> 4;
+  			byte0 = byte0 << 4;
+  			byte0 = byte0 >> 4;
+  			ln = byte0;
+			send[0]	= ascii_string[hn]; 
+			send[1]	= ascii_string[ln]; 
+		   	
+			uart_TxChar(send[0]);
+			uart_TxChar(send[1]);
+		}
+		{
+			byte1 = cid[1];
+			hn = byte1 >> 4;
+  			byte1 = byte1 << 4;
+  			byte1 = byte1 >> 4;
+  			ln = byte1;
+			send[0]	= ascii_string[hn]; 
+			send[1]	= ascii_string[ln]; 
+		   	
+			uart_TxChar(send[0]);
+			uart_TxChar(send[1]);
+		}
+		{
+			byte2 = cid[2];
+			hn = byte2 >> 4;
+  			byte2 = byte2 << 4;
+  			byte2 = byte2 >> 4;
+  			ln = byte2;
+			send[0]	= ascii_string[hn]; 
+			send[1]	= ascii_string[ln]; 
+		   	
+			uart_TxChar(send[0]);
+			uart_TxChar(send[1]);
+		}
+		{
+			byte3 = cid[3];
+			hn = byte3 >> 4;
+  			byte3 = byte3 << 4;
+  			byte3 = byte3 >> 4;
+  			ln = byte3;
+			send[0]	= ascii_string[hn]; 
+			send[1]	= ascii_string[ln]; 
+		   	
+			uart_TxChar(send[0]);
+			uart_TxChar(send[1]);
+		}
+		{
+			byte = cid[4];
+			hn = byte >> 4;
+  			byte3 = byte << 4;
+  			byte3 = byte >> 4;
+  			ln = byte;
+			send[0]	= ascii_string[hn]; 
+			send[1]	= ascii_string[ln]; 
+		   	
+			uart_TxChar(send[0]);
+			uart_TxChar(send[1]);
+		}
+		{
+			byte = cid[5];
+			hn = byte >> 4;
+  			byte3 = byte << 4;
+  			byte3 = byte >> 4;
+  			ln = byte;
+			send[0]	= ascii_string[hn]; 
+			send[1]	= ascii_string[ln]; 
+		   	
+			uart_TxChar(send[0]);
+			uart_TxChar(send[1]);
+		}
+		{
+			byte = cid[6];
+			hn = byte >> 4;
+  			byte3 = byte << 4;
+  			byte3 = byte >> 4;
+  			ln = byte;
+			send[0]	= ascii_string[hn]; 
+			send[1]	= ascii_string[ln]; 
+		   	
+			uart_TxChar(send[0]);
+			uart_TxChar(send[1]);
+		}
+		{
+			byte = cid[7];
+			hn = byte >> 4;
+  			byte3 = byte << 4;
+  			byte3 = byte >> 4;
+  			ln = byte;
+			send[0]	= ascii_string[hn]; 
+			send[1]	= ascii_string[ln]; 
+		   	
+			uart_TxChar(send[0]);
+			uart_TxChar(send[1]);
+		}
+		{
+			byte = cid[8];
+			hn = byte >> 4;
+  			byte3 = byte << 4;
+  			byte3 = byte >> 4;
+  			ln = byte;
+			send[0]	= ascii_string[hn]; 
+			send[1]	= ascii_string[ln]; 
+		   	
+			uart_TxChar(send[0]);
+			uart_TxChar(send[1]);
+		}
+		{
+			byte = cid[9];
+			hn = byte >> 4;
+  			byte3 = byte << 4;
+  			byte3 = byte >> 4;
+  			ln = byte;
+			send[0]	= ascii_string[hn]; 
+			send[1]	= ascii_string[ln]; 
+		   	
+			uart_TxChar(send[0]);
+			uart_TxChar(send[1]);
+		}
+		{
+			byte = cid[10];
+			hn = byte >> 4;
+  			byte3 = byte << 4;
+  			byte3 = byte >> 4;
+  			ln = byte;
+			send[0]	= ascii_string[hn]; 
+			send[1]	= ascii_string[ln]; 
+		   	
+			uart_TxChar(send[0]);
+			uart_TxChar(send[1]);
+		}
+		{
+			byte = cid[11];
+			hn = byte >> 4;
+  			byte3 = byte << 4;
+  			byte3 = byte >> 4;
+  			ln = byte;
+			send[0]	= ascii_string[hn]; 
+			send[1]	= ascii_string[ln]; 
+		   	
+			uart_TxChar(send[0]);
+			uart_TxChar(send[1]);
+		}
+		{
+			byte = cid[12];
+			hn = byte >> 4;
+  			byte3 = byte << 4;
+  			byte3 = byte >> 4;
+  			ln = byte;
+			send[0]	= ascii_string[hn]; 
+			send[1]	= ascii_string[ln]; 
+		   	
+			uart_TxChar(send[0]);
+			uart_TxChar(send[1]);
+		}
+		{
+			byte = cid[13];
+			hn = byte >> 4;
+  			byte3 = byte << 4;
+  			byte3 = byte >> 4;
+  			ln = byte;
+			send[0]	= ascii_string[hn]; 
+			send[1]	= ascii_string[ln]; 
+		   	
+			uart_TxChar(send[0]);
+			uart_TxChar(send[1]);
+		}
+
+
+#endif
+
+/*********************************************/
     /* Read CSD */
     if ((SD_SendCommand(SEND_CSD, 0, NULL, 0) != R1_NO_ERROR) ||
         SD_RecvDataBlock (CardConfig.csd, 16)==SD_FALSE) goto end;
@@ -432,6 +692,8 @@ SD_BOOL SD_ReadConfiguration ()
     {
         case CARDTYPE_SDV2_SC:
         case CARDTYPE_SDV2_HC:
+			for(j=0;tp24[j];j++)  	//transmit a predefined string
+    			uart_TxChar(tp24[j]);
             if ((SD_SendACommand (SD_STATUS, 0, buf, 1) !=  R1_NO_ERROR) ||
                 SD_RecvDataBlock(buf, 16) == SD_FALSE) goto end;      /* Read partial block */    
             for (i=64-16;i;i--) SPI_RecvByte();  /* Purge trailing data */            
@@ -509,3 +771,314 @@ SD_BOOL SD_WaitForReady (void)
 
     return SD_FALSE;
 }
+
+/**
+  * @brief  Read single or multiple sector(s) from memory card.
+  *
+  * @param  sect: Specifies the starting sector index to read
+  * @param  buf:  Pointer to byte array to store the data
+  * @param  cnt:  Specifies the count of sectors to read
+  * @retval SD_TRUE or SD_FALSE. 
+  */
+SD_BOOL SD_ReadSector (uint32_t sect, uint8_t *buf, uint32_t cnt)
+{
+    SD_BOOL flag;
+
+    /* Convert sector-based address to byte-based address for non SDHC */
+    if (CardType != CARDTYPE_SDV2_HC) sect <<= 9;
+
+    flag = SD_FALSE;
+
+    if (cnt > 1) /* Read multiple block */
+    {
+		if (SD_SendCommand(READ_MULTIPLE_BLOCK, sect, NULL, 0) == R1_NO_ERROR) 
+        {            
+			do {
+				if (SD_RecvDataBlock(buf, SECTOR_SIZE) == SD_FALSE) break;
+				buf += SECTOR_SIZE;
+			} while (--cnt);
+
+			/* Stop transmission */
+            SD_SendCommand(STOP_TRANSMISSION, 0, NULL, 0);				
+
+            /* Wait for the card is ready */
+            if (SD_WaitForReady() && cnt==0) flag = SD_TRUE;
+        }
+    }
+    else   /* Read single block */
+    {        
+        if ((SD_SendCommand(READ_SINGLE_BLOCK, sect, NULL, 0)==R1_NO_ERROR) &&
+            SD_RecvDataBlock(buf, SECTOR_SIZE)==SD_TRUE)    
+            flag = SD_TRUE;        
+    }
+
+    /* De-select the card */
+    SD_DeSelect();
+
+    return (flag);
+}
+
+/**
+  * @brief  Write single or multiple sectors to SD/MMC. 
+  *
+  * @param  sect: Specifies the starting sector index to write
+  * @param  buf: Pointer to the data array to be written
+  * @param  cnt: Specifies the number sectors to be written
+  * @retval SD_TRUE or SD_FALSE
+  */
+SD_BOOL SD_WriteSector (uint32_t sect, const uint8_t *buf, uint32_t cnt)
+{
+    SD_BOOL flag;
+
+    /* Convert sector-based address to byte-based address for non SDHC */
+    if (CardType != CARDTYPE_SDV2_HC) sect <<= 9; 
+
+    flag = SD_FALSE;
+    if (cnt > 1)  /* write multiple block */
+    { 
+        if (SD_SendCommand (WRITE_MULTIPLE_BLOCK, sect, NULL, 0) == R1_NO_ERROR)
+        {
+            do {
+                if (SD_SendDataBlock (buf, 0xFC, SECTOR_SIZE) == SD_FALSE)  break;
+                buf += SECTOR_SIZE;
+            } while (--cnt);
+
+            /* Send Stop Transmission Token. */
+            SPI_SendByte (0xFD);
+        
+            /* Wait for complete */
+            if (SD_WaitForReady() && cnt==0) flag = SD_TRUE;
+        }
+    }
+    else  /* write single block */
+    {
+    
+        if ( (SD_SendCommand (WRITE_SINGLE_BLOCK, sect, NULL, 0) == R1_NO_ERROR) &&
+            (SD_SendDataBlock (buf, 0xFE, SECTOR_SIZE) == SD_TRUE))
+            flag = SD_TRUE;
+    }
+
+    /* De-select the card */
+    SD_DeSelect();
+
+    return (flag);
+}
+
+/**
+  * @brief  Send a data block with specified length to SD/MMC. 
+  *
+  * @param  buf: Pointer to the data array to store the received data
+  * @param  tkn: Specifies the token to send before the data block
+  * @param  len: Specifies the length (in byte) to send.
+  *              The value should be 512 for memory card.
+  * @retval SD_TRUE or SD_FALSE
+  */
+SD_BOOL SD_SendDataBlock (const uint8_t *buf, uint8_t tkn, uint32_t len) 
+{
+    uint8_t recv;
+    int i, Timer1;
+    /* Send Start Block Token */
+    SPI_SendByte (tkn);
+
+    /* Send data block */
+#ifdef USE_FIFO
+    SPI_SendBlock_FIFO (buf, len);
+#else
+    for (i = 0; i < len; i++) 
+    {
+      SPI_SendByte (buf[i]);
+    }
+#endif
+
+    /* Send 2 bytes dummy CRC */
+    SPI_SendByte (0xFF);
+    SPI_SendByte (0xFF);
+
+    /* Read data response to check if the data block has been accepted. */
+    if (( (SPI_RecvByte ()) & 0x0F) != 0x05)
+        return (SD_FALSE); /* write error */
+
+    /* Wait for wirte complete. */
+    Timer1 = 2000000;  // 200ms Mathew  modified
+    do {
+        recv = SPI_RecvByte();
+        if (recv == 0xFF) break; 
+		Timer1--; 
+    } while (Timer1);
+
+    if (recv == 0xFF) return SD_TRUE;       /* write complete */
+    else              return (SD_FALSE);    /* write time out */
+
+}
+
+
+
+/*-----------------------------------------------------------------------*/
+/* Initialize Disk Drive                                                 */
+/*-----------------------------------------------------------------------*/
+
+DSTATUS disk_initialize (
+	BYTE drv		/* Physical drive number (0) */
+)
+{
+
+	SystemInit();
+   	uart_init(9600);  // Initialize the UART0 for 9600 baud rate
+
+
+	if (drv) return STA_NOINIT;			/* Supports only single drive */
+//	if (Stat & STA_NODISK) return Stat;	/* No card in the socket */
+
+	if (SD_Init() && SD_ReadConfiguration())
+		Stat &= ~STA_NOINIT;
+
+	return Stat;
+}
+
+/*-----------------------------------------------------------------------*/
+/* Miscellaneous Functions                                               */
+/*-----------------------------------------------------------------------*/
+DRESULT disk_ioctl (
+	BYTE drv,		/* Physical drive number (0) */
+	BYTE ctrl,		/* Control code */
+	void *buff		/* Buffer to send/receive control data */
+)
+{
+	DRESULT res;
+	BYTE n, *ptr = buff;
+
+	if (drv) return RES_PARERR;
+	if (Stat & STA_NOINIT) return RES_NOTRDY;
+
+	res = RES_ERROR;
+
+	switch (ctrl) {
+	case CTRL_SYNC :		/* Make sure that no pending write process */
+        SD_Select();
+		if (SD_WaitForReady() == SD_TRUE)
+			res = RES_OK;
+		break;
+
+	case GET_SECTOR_COUNT :	/* Get number of sectors on the disk (DWORD) */
+		*(DWORD*)buff = CardConfig.sectorcnt;
+		res = RES_OK;
+		break;
+
+	case GET_SECTOR_SIZE :	/* Get R/W sector size (WORD) */
+		*(WORD*)buff = CardConfig.sectorsize;	//512;
+		res = RES_OK;
+		break;
+
+	case GET_BLOCK_SIZE :	/* Get erase block size in unit of sector (DWORD) */
+		*(DWORD*)buff = CardConfig.blocksize;
+		res = RES_OK;
+		break;
+
+	case MMC_GET_TYPE :		/* Get card type flags (1 byte) */
+		*ptr = CardType;
+		res = RES_OK;
+		break;
+
+	case MMC_GET_CSD :		/* Receive CSD as a data block (16 bytes) */
+		for (n=0;n<16;n++)
+			*(ptr+n) = CardConfig.csd[n]; 
+		res = RES_OK;
+		break;
+
+	case MMC_GET_CID :		/* Receive CID as a data block (16 bytes) */
+		for (n=0;n<16;n++)
+			*(ptr+n) = CardConfig.cid[n];
+		res = RES_OK;
+		break;
+
+	case MMC_GET_OCR :		/* Receive OCR as an R3 resp (4 bytes) */
+		for (n=0;n<4;n++)
+			*(ptr+n) = CardConfig.ocr[n];
+		res = RES_OK;
+		break;
+
+	case MMC_GET_SDSTAT :	/* Receive SD status as a data block (64 bytes) */
+		for (n=0;n<64;n++)
+            *(ptr+n) = CardConfig.status[n]; 
+        res = RES_OK;   
+		break;
+
+	default:
+		res = RES_PARERR;
+	}
+
+    SD_DeSelect();
+
+	return res;
+}
+
+/*-----------------------------------------------------------------------*/
+/* Read Sector(s)                                                        */
+/*-----------------------------------------------------------------------*/
+DRESULT disk_read (
+	BYTE drv,			/* Physical drive number (0) */
+	BYTE *buff,			/* Pointer to the data buffer to store read data */
+	DWORD sector,		/* Start sector number (LBA) */
+	BYTE count			/* Sector count (1..255) */
+)
+{
+	if (drv || !count) return RES_PARERR;
+	if (Stat & STA_NOINIT) return RES_NOTRDY;
+
+	if (SD_ReadSector (sector, buff, count) == SD_TRUE)	
+		return RES_OK;
+	else
+		return RES_ERROR;
+}
+
+/*-----------------------------------------------------------------------*/
+/* Get Disk Status                                                       */
+/*-----------------------------------------------------------------------*/
+DSTATUS disk_status (
+	BYTE drv		/* Physical drive number (0) */
+)
+{
+	if (drv) return STA_NOINIT;		/* Supports only single drive */
+
+	return Stat;
+}
+
+/*-----------------------------------------------------------------------*/
+/* Write Sector(s)                                                       */
+/*-----------------------------------------------------------------------*/
+#if _READONLY == 0
+DRESULT disk_write (
+	BYTE drv,			/* Physical drive number (0) */
+	const BYTE *buff,	/* Pointer to the data to be written */
+	DWORD sector,		/* Start sector number (LBA) */
+	BYTE count			/* Sector count (1..255) */
+)
+{
+	if (drv || !count) return RES_PARERR;
+	if (Stat & STA_NOINIT) return RES_NOTRDY;
+//	if (Stat & STA_PROTECT) return RES_WRPRT;
+
+	if ( SD_WriteSector(sector, buff, count) == SD_TRUE)
+		return RES_OK;
+	else
+		return 	RES_ERROR;
+
+}
+#endif /* _READONLY == 0 */
+
+
+/*-----------------------------------------------------------------------*/
+/* Device timer function  (Platform dependent)                           */
+/*-----------------------------------------------------------------------*/
+/* This function must be called from timer interrupt routine in period
+/  of 10 ms to generate card control timing.
+*/
+//void disk_timerproc (void)
+//{
+//    WORD n;
+
+//	n = Timer1;						/* 100Hz decrement timer stopped at 0 */
+//	if (n) Timer1 = --n;
+//	n = Timer2;
+//	if (n) Timer2 = --n;               
+//}

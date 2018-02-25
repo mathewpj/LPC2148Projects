@@ -416,6 +416,11 @@
               <FileType>1</FileType>
               <FilePath>.\uart0.c</FilePath>
             </File>
+            <File>
+              <FileName>ff.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\ff.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
