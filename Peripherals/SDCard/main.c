@@ -49,9 +49,12 @@ main()
 	static FATFS FATFS_Obj;
 	FIL fil_obj;
 
-	for(i=0;tp1[i];i++)  //transmit a predefined string
+	SystemInit();
+   	uart_init(9600);  // Initialize the UART0 for 9600 baud rate
+ 
+ #if 0
+ 	for(i=0;tp1[i];i++)  //transmit a predefined string
         	uart_TxChar(tp1[i]);
-
  	ret = disk_initialize (0);
 	{
 	hn  = ret >> 4;
@@ -67,7 +70,7 @@ main()
 	uart_TxChar(send[0]);
 	uart_TxChar(send[1]);
 	}
-
+ #endif
 	f_err_code = f_mount(0, &FATFS_Obj);
 	{
 	for(i=0;tp3[i];i++)  //transmit a predefined string

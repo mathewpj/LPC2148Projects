@@ -601,10 +601,6 @@ DSTATUS disk_initialize (
 )
 {
 
-	SystemInit();
-   	uart_init(9600);  // Initialize the UART0 for 9600 baud rate
-
-
 	if (drv) return STA_NOINIT;			/* Supports only single drive */
 //	if (Stat & STA_NODISK) return Stat;	/* No card in the socket */
 
