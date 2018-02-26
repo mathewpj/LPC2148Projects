@@ -346,7 +346,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath></IncludePath>
+              <IncludePath>..\SDCard;.\uart;.\fatfs;.\sd;.\spi</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -392,34 +392,34 @@
               <FilePath>.\Startup.s</FilePath>
             </File>
             <File>
+              <FileName>ff.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\fatfs\ff.c</FilePath>
+            </File>
+            <File>
+              <FileName>sd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\sd\sd.c</FilePath>
+            </File>
+            <File>
+              <FileName>spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\spi\spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>uart0.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\uart\uart0.c</FilePath>
+            </File>
+            <File>
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\main.c</FilePath>
             </File>
             <File>
-              <FileName>sd.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\sd.c</FilePath>
-            </File>
-            <File>
-              <FileName>spi.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\spi.c</FilePath>
-            </File>
-            <File>
               <FileName>systemInit.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\systemInit.c</FilePath>
-            </File>
-            <File>
-              <FileName>uart0.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\uart0.c</FilePath>
-            </File>
-            <File>
-              <FileName>ff.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\ff.c</FilePath>
             </File>
           </Files>
         </Group>
