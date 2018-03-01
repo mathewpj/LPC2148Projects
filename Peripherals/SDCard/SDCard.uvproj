@@ -421,6 +421,11 @@
               <FileType>1</FileType>
               <FilePath>.\fatfs\ff.c</FilePath>
             </File>
+            <File>
+              <FileName>media_access.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\fatfs\media_access.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
