@@ -13,21 +13,24 @@ Folder : Peripherals
  	            	toolchain, programmer is working as expected.
 		      	Flashes a LED is everything is correct.
 
-	2) REAL_Time_Clock_with_ISR: Implements a Real Time Clock
-			in ISR mode. Displays the running clock on LCD.
+	2) REAL_Time_Clock_with_ISR: 
+	               Implements a Real Time Clock in ISR mode. Displays 
+		       the running clock on LCD.
 
-	3) Real_Time_Counter: Implements a Real Time Clock in polling
-			mode. Displays the running clokc on LCD.
+	3) Real_Time_Counter: 
+			Implements a Real Time Clock in polling mode. 
+			Displays the running clokc on LCD.
 
-	4) SDCard:	Implments file access via a Fatfs driver. Fatfs 
+	4) SDCard:	Implements file access via a Fatfs driver. Fatfs 
 			driver has been ported to work over SD Card Driver
 			which in turn uses SPI to access the card.	
 	
 	5) UART0:	Initializes communication over UART0 interface.
 			Transfers keystrokes to characters in LCD display.
 
-	6) UART0_Rx_via_ISR: Initializes communication over UART0 interface.
-			Sets up a ISR to handle data transfer. Displays keystrokes
+	6) UART0_Rx_via_ISR: 
+			Initializes communication over UART0 interface. Sets 
+			up a ISR to handle data transfer. Displays keystrokes
 			to LCD display.	
 
 
