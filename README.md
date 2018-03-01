@@ -17,7 +17,7 @@ Folder : Peripherals
 			in ISR mode. Displays the running clock on LCD.
 
 	3) Real_Time_Counter: Implements a Real Time Clock in polling
-			   mode. Displays the running clokc on LCD.
+			mode. Displays the running clokc on LCD.
 
 	4) SDCard:	Implments file access via a Fatfs driver. Fatfs 
 			driver has been ported to work over SD Card Driver
