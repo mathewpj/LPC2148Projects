@@ -41,14 +41,15 @@ main()
 	unsigned char tp3[]="\n\r Return from f_mount(): ";	
 	unsigned char tp4[]="\n\r Return from f_open(): ";	
 	unsigned char tp5[]="\n\r Return from f_read(): ";		
-	
+	unsigned char tp6[]="\n\r Result from f_lseek(): ";	
+	unsigned char tp7[]="\n\r Result from f_write(): ";			
 	uint32_t byte_read=0;
 	static uint8_t data_buffer[12];
 	BYTE ret;
 	FRESULT f_err_code;
 	static FATFS FATFS_Obj;
 	FIL fil_obj;
-
+	uint8_t write_data[] = "ABCDEFGHIJK";
 	SystemInit();
    	uart_init(9600);  // Initialize the UART0 for 9600 baud rate
  
@@ -85,8 +86,8 @@ main()
 	uart_TxChar(send[0]);
 	uart_TxChar(send[1]); 
 	}
-
-	ret = f_open((&fil_obj), "/1.txt", FA_READ);
+ 
+	ret = f_open((&fil_obj), "/WRITE.TXT", FA_READ|FA_WRITE);
 	{
 		for(i=0;tp4[i];i++)  //transmit a predefined string
         	uart_TxChar(tp4[i]);
@@ -99,7 +100,8 @@ main()
 	 	uart_TxChar(send[0]);
 		uart_TxChar(send[1]); 
 	}
-
+//	 f_sync(&fil_obj);
+#if 1
 	f_read((&fil_obj),data_buffer,11, &byte_read);
 	{
 		for(i=0;tp5[i];i++)  //transmit a predefined string
@@ -158,5 +160,36 @@ main()
 		uart_TxChar(send[1]); 
 		#endif 
 	}
- }
+ #endif
+ #if 0
+ 
+ #if 0
+      ret = f_lseek((&fil_obj), 0);
+	  for(i=0;tp6[i];i++)  //transmit a predefined string
+       	uart_TxChar(tp6[i]);
+		hn  = ret >> 4;
+  		ret = ret << 4;
+  		ret = ret >> 4;
+  		ln  = ret;
+		send[0]	= ascii_string[hn]; 
+		send[1]	= ascii_string[ln];  
+	 	uart_TxChar(send[0]);
+		uart_TxChar(send[1]); 
+ #endif
+    ret = f_write((&fil_obj),write_data,11, &byte_read);
+	for(i=0;tp7[i];i++)  //transmit a predefined string
+       	uart_TxChar(tp7[i]);
+		hn  = ret >> 4;
+  		ret = ret << 4;
+  		ret = ret >> 4;
+  		ln  = ret;
+		send[0]	= ascii_string[hn]; 
+		send[1]	= ascii_string[ln];  
+	 	uart_TxChar(send[0]);
+		uart_TxChar(send[1]); 
+#endif
+   f_sync(&fil_obj);	
+   f_close(&fil_obj);
+}
+
 

@@ -20,7 +20,7 @@
 /  data transfer. This reduces memory consumption 512 bytes each file object. */
 
 
-#define _FS_READONLY	1	/* 0:Read/Write or 1:Read only */
+#define _FS_READONLY	0	/* 0:Read/Write or 1:Read only */
 /* Setting _FS_READONLY to 1 defines read only configuration. This removes
 /  writing functions, f_write, f_sync, f_unlink, f_mkdir, f_chmod, f_rename,
 /  f_truncate and useless f_getfree. */
@@ -129,7 +129,7 @@
 /* Number of volumes (logical drives) to be used. */
 
 
-#define	_MAX_SS		512		/* 512, 1024, 2048 or 4096 */
+#define	_MAX_SS		1024		/* 512, 1024, 2048 or 4096 */
 /* Maximum sector size to be handled.
 /  Always set 512 for memory card and hard disk but a larger value may be
 /  required for floppy disk (512/1024) and optical disk (512/2048).

@@ -8,8 +8,6 @@
 #include "diskio.h"
 
 
-
-
 CARDCONFIG CardConfig;
 
 /* Local variables */
@@ -23,9 +21,7 @@ static volatile DSTATUS Stat = STA_NOINIT;	/* Disk status */
   *         SD_FALSE: Init failed. 
   *
   * Note: Refer to the init flow at http://elm-chan.org/docs/mmc/mmc_e.html
-  */
-
-
+  **/
 SD_BOOL SD_Init (void)
 {
 	unsigned int i, j, Timer1;
@@ -149,7 +145,6 @@ init_end:
     }
 }
 
-
 /**
   * @brief  Send a command and receive a response with specified format. 
   *
@@ -161,7 +156,7 @@ init_end:
   *         Value above 0x80 is the additional returned status code.
   *             0x81: Card is not ready
   *             0x82: command response time out error
-  */
+***/
 uint8_t SD_SendCommand (uint8_t cmd, uint32_t arg, uint8_t *buf, uint32_t len)
 {
     uint32_t r1,i;
@@ -229,7 +224,7 @@ uint8_t SD_SendCommand (uint8_t cmd, uint32_t arg, uint8_t *buf, uint32_t len)
   *             0x82: command response time out error
   *
   * Note: All the application specific commands should be precdeded with APP_CMD
-  */
+***/
 uint8_t SD_SendACommand (uint8_t cmd, uint32_t arg, uint8_t *buf, uint32_t len)
 {
     uint8_t r1;
@@ -247,7 +242,7 @@ uint8_t SD_SendACommand (uint8_t cmd, uint32_t arg, uint8_t *buf, uint32_t len)
   *
   * @param  None
   * @retval SD_TRUE or SD_FALSE. 
-  */
+***/
 SD_BOOL SD_ReadConfiguration ()
 {
     uint8_t buf[16], byte;
@@ -403,7 +398,7 @@ end:
   * @param  len: Specifies the length (in byte) to be received.
   *              The value should be a multiple of 4.
   * @retval SD_TRUE or SD_FALSE
-  */
+***/
 SD_BOOL SD_RecvDataBlock (uint8_t *buf, uint32_t len)
 {
     uint8_t datatoken;
@@ -438,7 +433,7 @@ SD_BOOL SD_RecvDataBlock (uint8_t *buf, uint32_t len)
   * @param  None
   * @retval SD_TRUE: Card is ready for read commands.
   *         SD_FALSE: Card is not ready 
-  */
+***/
 SD_BOOL SD_WaitForReady (void)
 {
     uint32_t Timer = 50000;    // 500ms
@@ -458,7 +453,7 @@ SD_BOOL SD_WaitForReady (void)
   * @param  buf:  Pointer to byte array to store the data
   * @param  cnt:  Specifies the count of sectors to read
   * @retval SD_TRUE or SD_FALSE. 
-  */
+***/
 SD_BOOL SD_ReadSector (uint32_t sect, uint8_t *buf, uint32_t cnt)
 {
     SD_BOOL flag;
@@ -504,7 +499,7 @@ SD_BOOL SD_ReadSector (uint32_t sect, uint8_t *buf, uint32_t cnt)
   * @param  buf: Pointer to the data array to be written
   * @param  cnt: Specifies the number sectors to be written
   * @retval SD_TRUE or SD_FALSE
-  */
+***/
 SD_BOOL SD_WriteSector (uint32_t sect, const uint8_t *buf, uint32_t cnt)
 {
     SD_BOOL flag;
@@ -551,7 +546,7 @@ SD_BOOL SD_WriteSector (uint32_t sect, const uint8_t *buf, uint32_t cnt)
   * @param  len: Specifies the length (in byte) to send.
   *              The value should be 512 for memory card.
   * @retval SD_TRUE or SD_FALSE
-  */
+***/
 SD_BOOL SD_SendDataBlock (const uint8_t *buf, uint8_t tkn, uint32_t len) 
 {
     uint8_t recv;
@@ -729,11 +724,32 @@ DRESULT disk_write (
 	BYTE count			/* Sector count (1..255) */
 )
 {
+	int i;
+	char ret, temp;
+	unsigned char tp1[]="\n\r Inside disk_write()";
+	unsigned char tp2[]="\n\r Inside SD_WriteSector(): ";
+	for(i=0;tp1[i];i++)  //transmit a predefined string
+        	uart_TxChar(tp1[i]);
 	if (drv || !count) return RES_PARERR;
 	if (Stat & STA_NOINIT) return RES_NOTRDY;
 //	if (Stat & STA_PROTECT) return RES_WRPRT;
 
-	if ( SD_WriteSector(sector, buff, count) == SD_TRUE)
+	//if ( SD_WriteSector(sector, buff, count) == SD_TRUE)
+	//	return RES_OK;
+	ret = SD_WriteSector(sector, buff, count);
+	for(i=0;tp2[i];i++)  //transmit a predefined string
+        	uart_TxChar(tp2[i]);
+	temp = ret;
+	hn  = temp >> 4;
+  	temp = temp << 4;
+  	temp = temp >> 4;
+  	ln  = temp;
+	send[0]	= ascii_string[hn]; 
+	send[1]	= ascii_string[ln];  
+	uart_TxChar(send[0]);
+	uart_TxChar(send[1]); 
+
+	if(ret == SD_TRUE)
 		return RES_OK;
 	else
 		return 	RES_ERROR;
@@ -741,6 +757,43 @@ DRESULT disk_write (
 }
 #endif /* _READONLY == 0 */
 
+
+DWORD get_fattime (void)
+{
+   DWORD time = 0;	
+   DWORD month = 0; 
+   DWORD day = 0; 
+   DWORD hour = 0; 
+   DWORD minute = 0;
+   static DWORD second = 0;
+   int i; 
+   unsigned char tp1[]="\n\r get_fattime()";
+   for(i=0;tp1[i];i++)  //transmit a predefined string
+        	uart_TxChar(tp1[i]); 
+  // bit31:25 Year origin from the 1980 (0..127, e.g. 37 for 2017)
+    time = (0x11 << 25);
+  //bit24:21 Month (1..12)
+  	month = 0x01;
+	month =  month << 21;
+	time = time | month;
+  //bit20:16 Day of the month(1..31)
+	day = 0x01;
+	day = day << 16;
+	time = time | day;
+  //bit15:11 Hour (0..23)
+    hour = 0x01;
+	hour = hour << 11;
+	time = time | hour; 
+  //bit10:5 Minute (0..59)
+    minute = 0x01;
+	minute = minute << 5;
+	time = time | minute; 
+  //bit4:0 Second / 2 (0..29, e.g. 25 for 50)	
+    time = time | second;
+	second++;
+
+    return(time); 
+}
 
 /*-----------------------------------------------------------------------*/
 /* Device timer function  (Platform dependent)                           */

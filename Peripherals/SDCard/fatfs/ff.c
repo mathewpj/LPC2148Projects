@@ -87,6 +87,7 @@
 
 #include "ff.h"			/* FatFs configurations and declarations */
 #include "diskio.h"		/* Declarations of low level disk I/O functions */
+#include "uart0.h"
 
 
 /*--------------------------------------------------------------------------
@@ -2010,9 +2011,7 @@ FRESULT f_open (
 	DIR dj;
 	BYTE *dir;
 	DEF_NAMEBUF;
-
-
-	fp->fs = 0;			/* Clear file object */
+ 	fp->fs = 0;			/* Clear file object */
 
 #if !_FS_READONLY
 	mode &= FA_READ | FA_WRITE | FA_CREATE_ALWAYS | FA_OPEN_ALWAYS | FA_CREATE_NEW;
@@ -2216,8 +2215,6 @@ FRESULT f_read (
 }
 
 
-
-
 #if !_FS_READONLY
 /*-----------------------------------------------------------------------*/
 /* Write File                                                            */
@@ -2236,9 +2233,8 @@ FRESULT f_write (
 	const BYTE *wbuff = buff;
 	BYTE csect;
 
-
 	*bw = 0;	/* Initialize byte counter */
-
+	
 	res = validate(fp->fs, fp->id);					/* Check validity of the object */
 	if (res != FR_OK) LEAVE_FF(fp->fs, res);
 	if (fp->flag & FA__ERROR)						/* Check abort flag */
@@ -2254,20 +2250,22 @@ FRESULT f_write (
 			if (!csect) {							/* On the cluster boundary? */
 				if (fp->fptr == 0) {				/* On the top of the file? */
 					clst = fp->org_clust;			/* Follow from the origin */
-					if (clst == 0)					/* When there is no cluster chain, */
+					if (clst == 0){					/* When there is no cluster chain, */
 						fp->org_clust = clst = create_chain(fp->fs, 0);	/* Create a new cluster chain */
+					}
 				} else {							/* Middle or end of the file */
 					clst = create_chain(fp->fs, fp->curr_clust);			/* Follow or stretch cluster chain */
 				}
 				if (clst == 0) break;				/* Could not allocate a new cluster (disk full) */
 				if (clst == 1) ABORT(fp->fs, FR_INT_ERR);
-				if (clst == 0xFFFFFFFF) ABORT(fp->fs, FR_DISK_ERR);
+				if (clst == 0xFFFFFFFF)	ABORT(fp->fs, FR_DISK_ERR);
 				fp->curr_clust = clst;				/* Update current cluster */
 			}
 #if _FS_TINY
 			if (fp->fs->winsect == fp->dsect && move_window(fp->fs, 0))	/* Write back data buffer prior to following direct transfer */
 				ABORT(fp->fs, FR_DISK_ERR);
 #else
+				
 			if (fp->flag & FA__DIRTY) {		/* Write back data buffer prior to following direct transfer */
 				if (disk_write(fp->fs->drv, fp->buf, fp->dsect, 1) != RES_OK)
 					ABORT(fp->fs, FR_DISK_ERR);
@@ -2323,15 +2321,11 @@ FRESULT f_write (
 		fp->flag |= FA__DIRTY;
 #endif
 	}
-
 	if (fp->fptr > fp->fsize) fp->fsize = fp->fptr;	/* Update file size if needed */
 	fp->flag |= FA__WRITTEN;						/* Set file change flag */
 
 	LEAVE_FF(fp->fs, FR_OK);
 }
-
-
-
 
 /*-----------------------------------------------------------------------*/
 /* Synchronize the File Object                                           */
