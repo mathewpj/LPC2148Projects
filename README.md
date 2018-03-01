@@ -7,23 +7,18 @@ Projects for LPC 2148
 RTOS Port for LPC2148
 1) Ensure that FreeRTOS 10.0.0 or greater is installed on your system
 
---------Peripherals
-	|
-	|	
-	------- LED_Blink: Basic program to check the IDE settings, 
- 	|		   toolchain, programmer is working as expected.
-	|		   Flashes a LED is everything is correct.
-	|
-	|	
-	------- REAL_Time_Clock_with_ISR: Implements a Real Time Clock
-	|		   in ISR mode. Displays the running clock on LCD.
-	|
-	|
-	-------	Real_Time_Counter: Implements a Real Time Clock in polling
-	|		   mode. Displays the running clokc on LCD.
-	|
-	|
-	-------	SDCard:
+Folder : Peripherals
+	1) LED_Blink: 	Basic program to check the IDE settings, 
+ 	            	toolchain, programmer is working as expected.
+		      	Flashes a LED is everything is correct.
+
+	2) REAL_Time_Clock_with_ISR: Implements a Real Time Clock
+			in ISR mode. Displays the running clock on LCD.
+
+	3) Real_Time_Counter: Implements a Real Time Clock in polling
+			   mode. Displays the running clokc on LCD.
+
+	4) SDCard:
 
 
 
