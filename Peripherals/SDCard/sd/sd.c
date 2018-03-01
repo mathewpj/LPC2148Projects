@@ -25,22 +25,20 @@ CARDCONFIG CardConfig;
   **/
 SD_BOOL SD_Init (void)
 {
-	unsigned int i, j, Timer1;
+	unsigned int i, Timer1;
     uint8_t  r1, buf[4];
-	unsigned char tp0[]="\n\rSD_Init() Start";
-	unsigned char tp1[]="\n\rSending 80 1's";
-	unsigned char tp2[]="\n\rSending CMD0: GO_IDLE_STATE";
-	unsigned char tp3[]="\n\rCard enters IDLE state....";
-	unsigned char tp4[]="\n\rSending CMD8: SEND_IF_COND";
-	unsigned char tp5[]="\n\rSending ACMD41: SEND_OP_COND";
-	unsigned char tp6[]="\n\rSending CMD58: READ_OCR";
-	unsigned char tp7[]="\n\rSending CMD16: SET_BLOCKLEN";
-	unsigned char tp100[]="\n\rSD_Init() End";
-	unsigned char hn, ln;
-	char	send[2];
+	char tp0[]="\n\rSD_Init() Start";
+	char tp1[]="\n\rSending 80 1's";
+	char tp2[]="\n\rSending CMD0: GO_IDLE_STATE";
+	char tp3[]="\n\rCard enters IDLE state....";
+	char tp4[]="\n\rSending CMD8: SEND_IF_COND";
+	char tp5[]="\n\rSending ACMD41: SEND_OP_COND";
+	char tp6[]="\n\rSending CMD58: READ_OCR";
+	char tp7[]="\n\rSending CMD16: SET_BLOCKLEN";
+	char tp8[]="\n\rSD_Init() End";
 
-	for(j=0;tp0[j];j++)  //transmit a predefined string
-    uart_TxChar(tp0[j]);
+	printString(tp0);
+	
    	/* Set card type to unknown */
    	CardType = CARDTYPE_UNKNOWN;
 
@@ -51,8 +49,7 @@ SD_BOOL SD_Init (void)
    	(between 100kHz and 400kHz) with CS high and DI (MISO) high. */
     SD_DeSelect();
 	
-	for(j=0;tp1[j];j++)  //transmit a predefined string
-    uart_TxChar(tp1[j]);
+	printString(tp1);
     
 	SPI_ConfigClockRate (SPI_CLOCKRATE_LOW);
     for (i = 0; i < 10; i++) SPI_SendByte (0xFF);
@@ -63,8 +60,7 @@ SD_BOOL SD_Init (void)
    	Since the CMD0 (and CMD8) must be sent as a native command, the CRC field
    	must have a valid value. */
 		
-	for(j=0;tp2[j];j++)  //transmit a predefined string
-    uart_TxChar(tp2[j]);	
+	printString(tp2);	
 
 	if (SD_SendCommand (GO_IDLE_STATE, 0, NULL, 0) != R1_IN_IDLE_STATE) // CMD0
     {
@@ -72,11 +68,8 @@ SD_BOOL SD_Init (void)
     }
 	/* Now the card enters IDLE state. */
 
-	for(j=0;tp3[j];j++)  //transmit a predefined string
-    	uart_TxChar(tp3[j]);
-    		
-	for(j=0;tp4[j];j++)  //transmit a predefined string
-    	uart_TxChar(tp4[j]);
+	printString(tp3);
+	printString(tp4);
 
 	/* Card type identification Start ... */
 	/* Check the card type, needs around 1000ms */    
@@ -88,16 +81,15 @@ SD_BOOL SD_Init (void)
         if (buf[2]!= 0x01 || buf[3]!=0xAA) goto init_end; 
 
         /* The card is SD V2 and can work at voltage range of 2.7 to 3.6V */
-		for(j=0;tp5[j];j++)  //transmit a predefined string
-    	uart_TxChar(tp5[j]);
+		printString(tp5);
         do {Timer1 --; 
             r1 = SD_SendACommand (SD_SEND_OP_COND, 0x40000000, NULL, 0);  // ACMD41
             if      (r1 == 0x00) break;
             else if (r1 > 0x01)  goto init_end;            
         } while (Timer1);
 
-		for(j=0;tp6[j];j++)  //transmit a predefined string
-    	uart_TxChar(tp6[j]);
+		printString(tp6);
+
         if (Timer1 && SD_SendCommand (READ_OCR, 0, buf, 4)==R1_NO_ERROR)  // CMD58
             CardType = (buf[0] & 0x40) ? CARDTYPE_SDV2_HC : CARDTYPE_SDV2_SC;
          
@@ -124,17 +116,13 @@ SD_BOOL SD_Init (void)
         CardType == CARDTYPE_SDV1 ||
         CardType == CARDTYPE_SDV2_SC )
     {
-		for(j=0;tp7[j];j++)  //transmit a predefined string
-    	uart_TxChar(tp7[j]);
+		printString(tp7);
         if (SD_SendCommand (SET_BLOCKLEN, SECTOR_SIZE, NULL, 0) != R1_NO_ERROR)
             CardType = CARDTYPE_UNKNOWN;
     }
 
 init_end:
-/**************** Mathew **************/
-	for(j=0;tp100[j];j++)  //transmit a predefined string
-    	uart_TxChar(tp100[j]);
-/**************************************/
+	printString(tp8);
 
    	SD_DeSelect();
 
@@ -164,12 +152,7 @@ uint8_t SD_SendCommand (uint8_t cmd, uint32_t arg, uint8_t *buf, uint32_t len)
 {
     uint32_t r1,i;
     uint8_t crc_stop;
-	unsigned char tp3[]="\n\rInside SD_SendCommand return 0x81";
-	unsigned char tp4[]="\n\rSending CMD0";	
-	unsigned char tp5[]="\n\rReceived Response from SD Card";
-	unsigned char hn, ln;
-	char	send[2];
-
+	
     /* The CS signal must be kept low during a transaction */
     SD_Select();
 	/* Mathew Added this delay */
@@ -183,9 +166,7 @@ uint8_t SD_SendCommand (uint8_t cmd, uint32_t arg, uint8_t *buf, uint32_t len)
     else if (cmd == SEND_IF_COND)   crc_stop = 0x87; /* valid CRC7 + stop bit */
     else                            crc_stop = 0x01; /* dummy CRC7 + Stop bit */
 
-   	//for(j=0;tp4[j];j++)  //transmit a predefined string
-    //    	uart_TxChar(tp4[j]);
-    /* Send 6-byte command with CRC. */
+   	/* Send 6-byte command with CRC. */
     SPI_SendByte (cmd | 0x40);
     SPI_SendByte (arg >> 24);
     SPI_SendByte (arg >> 16);
@@ -249,96 +230,43 @@ uint8_t SD_SendACommand (uint8_t cmd, uint32_t arg, uint8_t *buf, uint32_t len)
 ***/
 SD_BOOL SD_ReadConfiguration ()
 {
-    uint8_t buf[16], byte;
-    uint32_t i,j, c_size, c_size_mult, read_bl_len;
+    uint8_t buf[16], reg;
+    uint32_t i, c_size, c_size_mult, read_bl_len;
     SD_BOOL retv;
 
-	unsigned char tp20[]="\n\n\rSD_ReadConfiguration() Start";
-	unsigned char tp21[]="\n\rSending CMD58: READ_OCR";
-	unsigned char tp22[]="\n\rResponse to CMD58: READ_OCR: ";
-	unsigned char tp23[]="\n\rSending CMD10: READ_CID";
-	unsigned char tp24[]="\n\rSending CMD9: READ_CSD";
-   	unsigned char tp25[]="\n\rCard Type CARDTYPE_SDV2_HC";
-	unsigned char tp26[]="\n\rSD_ReadConfiguration() End";
-	unsigned char hn, ln;
-	char	send[2];
-
-	for(j=0;tp20[j];j++)  	//transmit a predefined string
-    	uart_TxChar(tp20[j]);
+	char tp0[]="\n\n\rSD_ReadConfiguration() Start";
+	char tp1[]="\n\rSending CMD58: READ_OCR";
+	char tp2[]="\n\rResponse to CMD58: READ_OCR: ";
+	char tp3[]="\n\rSending CMD10: READ_CID";
+	char tp4[]="\n\rSending CMD9: READ_CSD";
+   	char tp5[]="\n\rCard Type CARDTYPE_SDV2_HC";
+	char tp6[]="\n\rSD_ReadConfiguration() End";
+	
+	printString(tp0);
 
     retv = SD_FALSE;
 
     /* Read OCR */
-	for(j=0;tp21[j];j++)  	//transmit a predefined string
-    	uart_TxChar(tp21[j]);
+	printString(tp1);
     if (SD_SendCommand(READ_OCR, 0, CardConfig.ocr, 4) != R1_NO_ERROR) goto end;
 
-/****************Mathew *********************/
-	for(j=0;tp22[j];j++)  	//transmit a predefined string
-    	uart_TxChar(tp22[j]);
-#if 1
-		{
-			byte = CardConfig.ocr[0];
-			hn = byte >> 4;
-  			byte = byte << 4;
-  			byte = byte >> 4;
-  			ln = byte;
-			send[0]	= ascii_string[hn]; 
-			send[1]	= ascii_string[ln]; 
-		   	
-			uart_TxChar(send[0]);
-			uart_TxChar(send[1]);
-		}
-		{
-			byte = CardConfig.ocr[1];
-			hn = byte >> 4;
-  			byte = byte << 4;
-  			byte = byte >> 4;
-  			ln = byte;
-			send[0]	= ascii_string[hn]; 
-			send[1]	= ascii_string[ln]; 
-		   	
-			uart_TxChar(send[0]);
-			uart_TxChar(send[1]);
-		}
-		{
-			byte = CardConfig.ocr[2];
-			hn = byte >> 4;
-  			byte = byte << 4;
-  			byte = byte >> 4;
-  			ln = byte;
-			send[0]	= ascii_string[hn]; 
-			send[1]	= ascii_string[ln]; 
-		   	
-			uart_TxChar(send[0]);
-			uart_TxChar(send[1]);
-		}
-		{
-			byte = CardConfig.ocr[3];
-			hn = byte >> 4;
-  			byte = byte << 4;
-  			byte = byte >> 4;
-  			ln = byte;
-			send[0]	= ascii_string[hn]; 
-			send[1]	= ascii_string[ln]; 
-		   	
-			uart_TxChar(send[0]);
-			uart_TxChar(send[1]);
-		}
-
-
-#endif
-/*******************************************/
+	printString(tp2);
+	reg = CardConfig.ocr[0];
+	printChar_BCD(reg);
+	reg	= CardConfig.ocr[1];
+	printChar_BCD(reg);
+	reg = CardConfig.ocr[2];
+	printChar_BCD(reg);
+	reg = CardConfig.ocr[3];
+	printChar_BCD(reg);
   		
     /* Read CID */
-	for(j=0;tp23[j];j++)  	//transmit a predefined string
-    uart_TxChar(tp23[j]);
+	printString(tp3);
     if ((SD_SendCommand(SEND_CID, 0, NULL, 0) != R1_NO_ERROR) ||
         SD_RecvDataBlock (CardConfig.cid, 16)==SD_FALSE) goto end;
 
     /* Read CSD */
-	for(j=0;tp24[j];j++)  	//transmit a predefined string
-    uart_TxChar(tp24[j]);
+	printString(tp4);
     if ((SD_SendCommand(SEND_CSD, 0, NULL, 0) != R1_NO_ERROR) ||
         SD_RecvDataBlock (CardConfig.csd, 16)==SD_FALSE) goto end;
 
@@ -371,8 +299,7 @@ SD_BOOL SD_ReadConfiguration ()
     {
         case CARDTYPE_SDV2_SC:
         case CARDTYPE_SDV2_HC:
-			for(j=0;tp25[j];j++)  	//transmit a predefined string
-    			uart_TxChar(tp25[j]);
+			printString(tp5);
             if ((SD_SendACommand (SD_STATUS, 0, buf, 1) !=  R1_NO_ERROR) ||
                 SD_RecvDataBlock(buf, 16) == SD_FALSE) goto end;      /* Read partial block */    
             for (i=64-16;i;i--) SPI_RecvByte();  /* Purge trailing data */            
@@ -392,8 +319,7 @@ SD_BOOL SD_ReadConfiguration ()
     retv = SD_TRUE;
 end:
     SD_DeSelect ();
-    for(j=0;tp26[j];j++)  	//transmit a predefined string
-    	uart_TxChar(tp26[j]);
+    printString(tp6);
     return retv;
 }
 

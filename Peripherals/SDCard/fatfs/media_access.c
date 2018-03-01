@@ -1,5 +1,5 @@
 #include "type.h"
-//#include "debug.h"
+#include "debug.h"
 #include "media_access.h"
 #include "sd.h"
 #include "spi.h"
@@ -147,55 +147,29 @@ DRESULT disk_write (
 	BYTE count			/* Sector count (1..255) */
 )
 {
-	int i;
-	char ret, temp;
-	unsigned char hn, ln;
-	char	send[2];
-
-	unsigned char tp1[]="\n\r Inside disk_write()";
-	unsigned char tp2[]="\n\r Inside SD_WriteSector(): ";
-	for(i=0;tp1[i];i++)  //transmit a predefined string
-        	uart_TxChar(tp1[i]);
 	if (drv || !count) return RES_PARERR;
 	if (Stat & STA_NOINIT) return RES_NOTRDY;
 //	if (Stat & STA_PROTECT) return RES_WRPRT;
 
-	//if ( SD_WriteSector(sector, buff, count) == SD_TRUE)
-	//	return RES_OK;
-	ret = SD_WriteSector(sector, buff, count);
-	for(i=0;tp2[i];i++)  //transmit a predefined string
-        	uart_TxChar(tp2[i]);
-	temp = ret;
-	hn  = temp >> 4;
-  	temp = temp << 4;
-  	temp = temp >> 4;
-  	ln  = temp;
-	send[0]	= ascii_string[hn]; 
-	send[1]	= ascii_string[ln];  
-	uart_TxChar(send[0]);
-	uart_TxChar(send[1]); 
-
-	if(ret == SD_TRUE)
+	if ( SD_WriteSector(sector, buff, count) == SD_TRUE)
 		return RES_OK;
 	else
 		return 	RES_ERROR;
-
 }
 #endif /* _READONLY == 0 */
 
 
 DWORD get_fattime (void)
 {
-   DWORD time = 0;	
-   DWORD month = 0; 
-   DWORD day = 0; 
-   DWORD hour = 0; 
-   DWORD minute = 0;
-   static DWORD second = 0;
-   int i; 
-   unsigned char tp1[]="\n\r get_fattime()";
-   for(i=0;tp1[i];i++)  //transmit a predefined string
-        	uart_TxChar(tp1[i]); 
+   	DWORD time = 0;	
+   	DWORD month = 0; 
+   	DWORD day = 0; 
+   	DWORD hour = 0; 
+   	DWORD minute = 0;
+   	static DWORD second = 0;
+   	char tp0[]="\n\r Inside get_fattime()";
+   	
+	printString(tp0);
   // bit31:25 Year origin from the 1980 (0..127, e.g. 37 for 2017)
     time = (0x11 << 25);
   //bit24:21 Month (1..12)

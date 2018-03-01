@@ -13,6 +13,7 @@
 #include "sd.h"
 #include "diskio.h"
 #include "ff.h"
+#include "debug.h"
 
 uint8_t CardType;
 
@@ -33,75 +34,30 @@ void delay(unsigned long int count1)
 
 main()
 {
-	int i;
-	unsigned char tp1[]="\n\r Before call to disk_initialize()";		
-	unsigned char tp2[]="\n\r Return from disk_initialize(): ";
-	unsigned char tp3[]="\n\r Return from f_mount(): ";	
-	unsigned char tp4[]="\n\r Return from f_open(): ";	
-	unsigned char tp5[]="\n\r Return from f_read(): ";		
-	unsigned char tp6[]="\n\r Result from f_lseek(): ";	
-	unsigned char tp7[]="\n\r Result from f_write(): ";	
-	unsigned char hn, ln, temp;
-	uint8_t	send[2];
-		
+	
+	char tp3[]="\n\r Return from f_mount(): ";	
+	char tp4[]="\n\r Return from f_open(): ";	
+	char tp5[]="\n\r Return from f_read(): ";		
+	char tp6[]="\n\r Result from f_lseek(): ";	
+	char tp7[]="\n\r Result from f_write(): ";	
 	uint32_t byte_read=0;
 	static uint8_t data_buffer[12];
 	BYTE ret;
-	FRESULT f_err_code;
+	
 	static FATFS FATFS_Obj;
 	FIL fil_obj;
-	uint8_t write_data[] = "ABCDEFGHIJK";
+	uint8_t write_data[] = "HELLO MATHEW";
 	SystemInit();
    	uart_init(9600);  // Initialize the UART0 for 9600 baud rate
- 
- #if 0
- 	for(i=0;tp1[i];i++)  //transmit a predefined string
-        	uart_TxChar(tp1[i]);
- 	ret = disk_initialize (0);
-	{
-	hn  = ret >> 4;
-  	ret = ret << 4;
-  	ret = ret >> 4;
-  	ln  = ret;
-	send[0]	= ascii_string[hn]; 
-	send[1]	= ascii_string[ln]; 
-
-	for(i=0;tp2[i];i++)  //transmit a predefined string
-        	uart_TxChar(tp2[i]);
-	   	
-	uart_TxChar(send[0]);
-	uart_TxChar(send[1]);
-	}
- #endif
-	f_err_code = f_mount(0, &FATFS_Obj);
-	{
-	for(i=0;tp3[i];i++)  //transmit a predefined string
-        	uart_TxChar(tp3[i]);
-	
-	hn  = f_err_code >> 4;
-  	f_err_code = f_err_code << 4;
-  	f_err_code = f_err_code >> 4;
-  	ln  = f_err_code;
-	send[0]	= ascii_string[hn]; 
-	send[1]	= ascii_string[ln];
-	uart_TxChar(send[0]);
-	uart_TxChar(send[1]); 
-	}
+	//	uart_init(19200);  // Initialize the UART0 for 9600 baud rate 
+ 	ret = f_mount(0, &FATFS_Obj);
+	printString(tp3);
+	printChar_BCD(ret);	
  
 	ret = f_open((&fil_obj), "/WRITE.TXT", FA_READ|FA_WRITE);
-	{
-		for(i=0;tp4[i];i++)  //transmit a predefined string
-        	uart_TxChar(tp4[i]);
-		hn  = ret >> 4;
-  		ret = ret << 4;
-  		ret = ret >> 4;
-  		ln  = ret;
-		send[0]	= ascii_string[hn]; 
-		send[1]	= ascii_string[ln];  
-	 	uart_TxChar(send[0]);
-		uart_TxChar(send[1]); 
-	}
-//	 f_sync(&fil_obj);
+	printString(tp4);
+	printChar_BCD(ret);
+					   
 #if 0
 	f_read((&fil_obj),data_buffer,11, &byte_read);
 	{
@@ -178,16 +134,8 @@ main()
 		uart_TxChar(send[1]); 
  #endif
     ret = f_write((&fil_obj),write_data,11, &byte_read);
-	for(i=0;tp7[i];i++)  //transmit a predefined string
-       	uart_TxChar(tp7[i]);
-		hn  = ret >> 4;
-  		ret = ret << 4;
-  		ret = ret >> 4;
-  		ln  = ret;
-		send[0]	= ascii_string[hn]; 
-		send[1]	= ascii_string[ln];  
-	 	uart_TxChar(send[0]);
-		uart_TxChar(send[1]); 
+	printString(tp7);
+	printChar_BCD(ret);
 #endif
    f_sync(&fil_obj);	
    f_close(&fil_obj);
