@@ -8,6 +8,7 @@ RTOS Port for LPC2148
 1) Ensure that FreeRTOS 10.0.0 or greater is installed on your system
 
 Folder : Peripherals
+
 	1) LED_Blink: 	Basic program to check the IDE settings, 
  	            	toolchain, programmer is working as expected.
 		      	Flashes a LED is everything is correct.
@@ -18,7 +19,15 @@ Folder : Peripherals
 	3) Real_Time_Counter: Implements a Real Time Clock in polling
 			   mode. Displays the running clokc on LCD.
 
-	4) SDCard:
+	4) SDCard:	Implments file access via a Fatfs driver. Fatfs 
+			driver has been ported to work over SD Card Driver
+			which in turn uses SPI to access the card.	
+	
+	5) UART0:	Initializes communication over UART0 interface.
+			Transfers keystrokes to characters in LCD display.
 
+	6) UART0_Rx_via_ISR: Initializes communication over UART0 interface.
+			Sets up a ISR to handle data transfer. Displays keystrokes
+			to LCD display.	
 
 
