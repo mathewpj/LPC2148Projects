@@ -426,6 +426,11 @@
               <FileType>1</FileType>
               <FilePath>.\fatfs\media_access.c</FilePath>
             </File>
+            <File>
+              <FileName>debug.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\debug.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
