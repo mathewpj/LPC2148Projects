@@ -38,17 +38,17 @@ main()
 	char tp3[]="\n\r Return from f_mount(): ";	
 	char tp4[]="\n\r Return from f_open(): ";	
 	char tp5[]="\n\r Return from f_read(): ";		
-	char tp6[]="\n\r Result from f_lseek(): ";	
-	char tp7[]="\n\r Result from f_write(): ";	
+	char tp6[]="\n\r Return from f_lseek(): ";	
+	char tp7[]="\n\r Return from f_puts(): ";	
 	uint32_t byte_read=0;
-	uint8_t data_buffer[13];
+	char data_buffer[13];
 	BYTE ret;
 	
 	static FATFS FATFS_Obj;
 	FIL fil_obj;
-	uint8_t write_data[] = "HELLO NXP";
+	char write_data[] = "HELLO WORLD ";
 	SystemInit();
-   	uart_init(9600);  // Initialize the UART0 for 19200 baud rate
+   	uart_init(9600);  // Initialize the UART0 for 9600 baud rate
 	
  	ret = f_mount(0, &FATFS_Obj);
 	printString(tp3);
@@ -58,32 +58,23 @@ main()
 	printString(tp4);
 	printChar_BCD(ret);
 					   
-	ret = f_read((&fil_obj),data_buffer,12, &byte_read);
-	data_buffer[13] = '\0'; 
+	ret = f_read((&fil_obj),data_buffer,11, &byte_read);
+	data_buffer[12] = '\0'; 
 	printString(tp5);
 	printString(data_buffer);
 
- #if 1
- 
- #if 0
-      ret = f_lseek((&fil_obj), 0);
-	  for(i=0;tp6[i];i++)  //transmit a predefined string
-       	uart_TxChar(tp6[i]);
-		hn  = ret >> 4;
-  		ret = ret << 4;
-  		ret = ret >> 4;
-  		ln  = ret;
-		send[0]	= ascii_string[hn]; 
-		send[1]	= ascii_string[ln];  
-	 	uart_TxChar(send[0]);
-		uart_TxChar(send[1]); 
- #endif
-    ret = f_write((&fil_obj),write_data,11, &byte_read);
+	// Move the read/write pointer to the end of the file
+    ret = f_lseek((&fil_obj), fil_obj.fsize);
+	printString(tp6);
+	printChar_BCD(ret);  
+								
+	ret = f_puts(write_data, &fil_obj);
 	printString(tp7);
 	printChar_BCD(ret);
-#endif
+ 
    f_sync(&fil_obj);	
    f_close(&fil_obj);
+   f_mount(0, NULL);
 }
 
 

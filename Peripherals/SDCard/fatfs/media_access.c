@@ -155,6 +155,7 @@ DRESULT disk_write (
 		return RES_OK;
 	else
 		return 	RES_ERROR;
+	
 }
 #endif /* _READONLY == 0 */
 
@@ -167,9 +168,9 @@ DWORD get_fattime (void)
    	DWORD hour = 0; 
    	DWORD minute = 0;
 	static DWORD second = 0;
-   	
+	// TODO - Mathew Implment a Real get time function. 
+	// Needs a bettery to keep time between boots  	
    	char tp0[]="\n\r Inside get_fattime()";
-	char byte = 0;
    	
 	printString(tp0);
   // bit31:25 Year origin from the 1980 (0..127, e.g. 37 for 2017)
@@ -193,9 +194,7 @@ DWORD get_fattime (void)
   //bit4:0 Second / 2 (0..29, e.g. 25 for 50)	
     time = time | second;
 	second = second + 2;
-	byte = (char)second;
-	printChar_BCD(byte);
-    return(time); 
+	return(time); 
 }
 
 /*-----------------------------------------------------------------------*/
