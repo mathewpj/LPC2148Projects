@@ -6,12 +6,13 @@
 #include "spi.h"
 #include "uart0.h"
 #include "diskio.h"
+#include "media_access.h"
 
-
+extern char ascii_string[];
 CARDCONFIG CardConfig;
 
 /* Local variables */
-static volatile DSTATUS Stat = STA_NOINIT;	/* Disk status */
+//static volatile DSTATUS Stat = STA_NOINIT;	/* Disk status */
 
 /**
   * @brief  Initializes the memory card.
@@ -35,6 +36,8 @@ SD_BOOL SD_Init (void)
 	unsigned char tp6[]="\n\rSending CMD58: READ_OCR";
 	unsigned char tp7[]="\n\rSending CMD16: SET_BLOCKLEN";
 	unsigned char tp100[]="\n\rSD_Init() End";
+	unsigned char hn, ln;
+	char	send[2];
 
 	for(j=0;tp0[j];j++)  //transmit a predefined string
     uart_TxChar(tp0[j]);
@@ -164,7 +167,8 @@ uint8_t SD_SendCommand (uint8_t cmd, uint32_t arg, uint8_t *buf, uint32_t len)
 	unsigned char tp3[]="\n\rInside SD_SendCommand return 0x81";
 	unsigned char tp4[]="\n\rSending CMD0";	
 	unsigned char tp5[]="\n\rReceived Response from SD Card";
-	
+	unsigned char hn, ln;
+	char	send[2];
 
     /* The CS signal must be kept low during a transaction */
     SD_Select();
@@ -256,6 +260,8 @@ SD_BOOL SD_ReadConfiguration ()
 	unsigned char tp24[]="\n\rSending CMD9: READ_CSD";
    	unsigned char tp25[]="\n\rCard Type CARDTYPE_SDV2_HC";
 	unsigned char tp26[]="\n\rSD_ReadConfiguration() End";
+	unsigned char hn, ln;
+	char	send[2];
 
 	for(j=0;tp20[j];j++)  	//transmit a predefined string
     	uart_TxChar(tp20[j]);
@@ -585,7 +591,7 @@ SD_BOOL SD_SendDataBlock (const uint8_t *buf, uint8_t tkn, uint32_t len)
 
 }
 
-
+#if 0
 
 /*-----------------------------------------------------------------------*/
 /* Initialize Disk Drive                                                 */
@@ -728,6 +734,8 @@ DRESULT disk_write (
 	char ret, temp;
 	unsigned char tp1[]="\n\r Inside disk_write()";
 	unsigned char tp2[]="\n\r Inside SD_WriteSector(): ";
+	unsigned char hn, ln;
+	char	send[2];
 	for(i=0;tp1[i];i++)  //transmit a predefined string
         	uart_TxChar(tp1[i]);
 	if (drv || !count) return RES_PARERR;
@@ -768,6 +776,9 @@ DWORD get_fattime (void)
    static DWORD second = 0;
    int i; 
    unsigned char tp1[]="\n\r get_fattime()";
+   unsigned char hn, ln;
+   char	send[2];
+
    for(i=0;tp1[i];i++)  //transmit a predefined string
         	uart_TxChar(tp1[i]); 
   // bit31:25 Year origin from the 1980 (0..127, e.g. 37 for 2017)
@@ -810,3 +821,5 @@ DWORD get_fattime (void)
 //	n = Timer2;
 //	if (n) Timer2 = --n;               
 //}
+
+ #endif

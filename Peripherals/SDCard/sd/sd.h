@@ -13,6 +13,7 @@
 #ifndef __SD_H_
 #define __SD_H_
 
+#include <stdint.h>
 #include "LPC214x.H"
 
 /* type defintion */

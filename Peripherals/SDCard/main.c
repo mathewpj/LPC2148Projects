@@ -17,8 +17,6 @@
 uint8_t CardType;
 
 extern char ascii_string[16];
-extern unsigned char hn, ln, temp;
-extern uint8_t	send[2];
 
 /***********************/
 /* Delay Time Function */
@@ -42,7 +40,10 @@ main()
 	unsigned char tp4[]="\n\r Return from f_open(): ";	
 	unsigned char tp5[]="\n\r Return from f_read(): ";		
 	unsigned char tp6[]="\n\r Result from f_lseek(): ";	
-	unsigned char tp7[]="\n\r Result from f_write(): ";			
+	unsigned char tp7[]="\n\r Result from f_write(): ";	
+	unsigned char hn, ln, temp;
+	uint8_t	send[2];
+		
 	uint32_t byte_read=0;
 	static uint8_t data_buffer[12];
 	BYTE ret;
@@ -101,7 +102,7 @@ main()
 		uart_TxChar(send[1]); 
 	}
 //	 f_sync(&fil_obj);
-#if 1
+#if 0
 	f_read((&fil_obj),data_buffer,11, &byte_read);
 	{
 		for(i=0;tp5[i];i++)  //transmit a predefined string
@@ -161,7 +162,7 @@ main()
 		#endif 
 	}
  #endif
- #if 0
+ #if 1
  
  #if 0
       ret = f_lseek((&fil_obj), 0);
