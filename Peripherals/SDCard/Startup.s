@@ -69,7 +69,7 @@ SVC_Stack_Size  EQU     0x00000008
 ABT_Stack_Size  EQU     0x00000000
 FIQ_Stack_Size  EQU     0x00000000
 IRQ_Stack_Size  EQU     0x00000080
-;//USR_Stack_Size  EQU     0x00004000
+;Increasing the Stack size from  0x00004000 to  0x00000800 - Mathew
 USR_Stack_Size  EQU     0x00000800
 
 

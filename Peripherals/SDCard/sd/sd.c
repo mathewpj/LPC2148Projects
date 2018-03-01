@@ -11,9 +11,6 @@
 extern char ascii_string[];
 CARDCONFIG CardConfig;
 
-/* Local variables */
-//static volatile DSTATUS Stat = STA_NOINIT;	/* Disk status */
-
 /**
   * @brief  Initializes the memory card.
   *

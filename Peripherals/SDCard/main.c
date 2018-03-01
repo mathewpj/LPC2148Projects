@@ -41,15 +41,15 @@ main()
 	char tp6[]="\n\r Result from f_lseek(): ";	
 	char tp7[]="\n\r Result from f_write(): ";	
 	uint32_t byte_read=0;
-	static uint8_t data_buffer[12];
+	uint8_t data_buffer[13];
 	BYTE ret;
 	
 	static FATFS FATFS_Obj;
 	FIL fil_obj;
-	uint8_t write_data[] = "HELLO MATHEW";
+	uint8_t write_data[] = "HELLO NXP";
 	SystemInit();
-   	uart_init(9600);  // Initialize the UART0 for 9600 baud rate
-	//	uart_init(19200);  // Initialize the UART0 for 9600 baud rate 
+   	uart_init(9600);  // Initialize the UART0 for 19200 baud rate
+	
  	ret = f_mount(0, &FATFS_Obj);
 	printString(tp3);
 	printChar_BCD(ret);	
@@ -58,66 +58,11 @@ main()
 	printString(tp4);
 	printChar_BCD(ret);
 					   
-#if 0
-	f_read((&fil_obj),data_buffer,11, &byte_read);
-	{
-		for(i=0;tp5[i];i++)  //transmit a predefined string
-        	uart_TxChar(tp5[i]);
-		uart_TxChar(data_buffer[0]);
-		uart_TxChar(data_buffer[1]);
-		uart_TxChar(data_buffer[2]);
-		uart_TxChar(data_buffer[3]);
-		uart_TxChar(data_buffer[4]);
-		uart_TxChar(data_buffer[5]);
-		uart_TxChar(data_buffer[6]);
-		uart_TxChar(data_buffer[7]);
-		uart_TxChar(data_buffer[8]);
-		uart_TxChar(data_buffer[9]);
-		uart_TxChar(data_buffer[10]);
-		uart_TxChar(data_buffer[11]);
-		#if 0
-		ret = data_buffer[0];
-		hn  = ret >> 4;
-  		ret = ret << 4;
-  		ret = ret >> 4;
-  		ln  = ret;
-		send[0]	= ascii_string[hn]; 
-		send[1]	= ascii_string[ln];  
-	 	uart_TxChar(send[0]);
-		uart_TxChar(send[1]);
-		
-		ret = data_buffer[1];
-		hn  = ret >> 4;
-  		ret = ret << 4;
-  		ret = ret >> 4;
-  		ln  = ret;
-		send[0]	= ascii_string[hn]; 
-		send[1]	= ascii_string[ln];  
-	 	uart_TxChar(send[0]);
-		uart_TxChar(send[1]); 
+	ret = f_read((&fil_obj),data_buffer,12, &byte_read);
+	data_buffer[13] = '\0'; 
+	printString(tp5);
+	printString(data_buffer);
 
-		ret = data_buffer[2];
-		hn  = ret >> 4;
-  		ret = ret << 4;
-  		ret = ret >> 4;
-  		ln  = ret;
-		send[0]	= ascii_string[hn]; 
-		send[1]	= ascii_string[ln];  
-	 	uart_TxChar(send[0]);
-		uart_TxChar(send[1]); 
-
-		ret = data_buffer[3];
-		hn  = ret >> 4;
-  		ret = ret << 4;
-  		ret = ret >> 4;
-  		ln  = ret;
-		send[0]	= ascii_string[hn]; 
-		send[1]	= ascii_string[ln];  
-	 	uart_TxChar(send[0]);
-		uart_TxChar(send[1]); 
-		#endif 
-	}
- #endif
  #if 1
  
  #if 0

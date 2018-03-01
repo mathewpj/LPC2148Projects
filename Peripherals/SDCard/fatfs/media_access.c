@@ -3,7 +3,7 @@
 #include "media_access.h"
 #include "sd.h"
 #include "spi.h"
-
+							
 extern char ascii_string[16];
 extern CARDCONFIG CardConfig;
 
@@ -166,8 +166,10 @@ DWORD get_fattime (void)
    	DWORD day = 0; 
    	DWORD hour = 0; 
    	DWORD minute = 0;
-   	static DWORD second = 0;
+	static DWORD second = 0;
+   	
    	char tp0[]="\n\r Inside get_fattime()";
+	char byte = 0;
    	
 	printString(tp0);
   // bit31:25 Year origin from the 1980 (0..127, e.g. 37 for 2017)
@@ -190,8 +192,9 @@ DWORD get_fattime (void)
 	time = time | minute; 
   //bit4:0 Second / 2 (0..29, e.g. 25 for 50)	
     time = time | second;
-	second++;
-
+	second = second + 2;
+	byte = (char)second;
+	printChar_BCD(byte);
     return(time); 
 }
 

@@ -346,7 +346,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>..\SDCard;.\uart;.\fatfs;.\sd;.\spi</IncludePath>
+              <IncludePath>..\SDCard;.\uart;.\fatfs;.\sd;.\spi;.\debug</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -429,7 +429,7 @@
             <File>
               <FileName>debug.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\debug.c</FilePath>
+              <FilePath>.\debug\debug.c</FilePath>
             </File>
           </Files>
         </Group>
